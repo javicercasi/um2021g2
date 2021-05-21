@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserModel
+from .models import UserModel, TagModel, PublicMessageModel
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -7,7 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserModel
-        fields = ['id', 'username', 'password', 'firstName', 'lastName', 'email', 'phone', 'birthday', 'bio', 'active']
+        fields = ['id', 'username', 'password', 'firstName', 'lastName', 'email', 'phone', 'birthday', 'bio', 'follows', 'active']
 
 
 class UserSignInSerializer(serializers.ModelSerializer):
@@ -16,3 +16,19 @@ class UserSignInSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ['username', 'password']
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """ Serializador relacionado al modelo de Tags """
+
+    class Meta:
+        model = TagModel
+        fields = ['id', 'name', 'ocurrencies']
+
+
+class PublicMessageSerializer(serializers.ModelSerializer):
+    """ Serializador relacionado al modelo de Mensajes publicos """
+
+    class Meta:
+        model = PublicMessageModel
+        fields = ['id', 'author', 'text', 'date', 'mentions', 'tags']
