@@ -1,10 +1,11 @@
-from .models import UserModel
+from datetime import datetime
+from .models import PublicMessageModel, UserModel
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializers import UserSerializer
+from .serializers import UserSerializer, PublicMessageSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from .forms import SignInForm
+from .forms import SignInForm, PublicMessageForm
 
 
 # Create your views here.
@@ -46,11 +47,43 @@ class SignIn(APIView):
             if user.password == data['password']:
                 return Response({
                     'state': 'successful',
+                    'csrfmiddlewaretoken': data['csrfmiddlewaretoken'],
                     'request': user_json.data,
-                    'csrfmiddlewaretoken': data['csrfmiddlewaretoken']
                     }, status=status.HTTP_200_OK)
         return Response({
             'state': 'failure',
             'request': data,
             'error': form.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Feed(APIView):
+
+    def get(self, request):
+        form = PublicMessageForm()
+        messages = PublicMessageModel.objects.all()
+        return render(request, "feed.html", {"form": form, "messages": messages})
+
+    def post(self, request):
+        form = PublicMessageForm(request.POST)
+        if form.is_valid():
+            data = {}
+            data['text'] = form.data['text']
+            data['date'] = datetime.now().date()
+            data['author'] = UserModel.objects.get(id=form.data['author']).id
+            serializer = PublicMessageSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                form = PublicMessageForm()
+                messages = PublicMessageModel.objects.all()
+                return render(request, "feed.html", {"form": form, "messages": messages})
+            return Response({
+                'state': 'serializer_failure',
+                'request': serializer.data,
+                'error': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+                'state': 'form_failure',
+                'request': form.data,
+                'error': form.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
