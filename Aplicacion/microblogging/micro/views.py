@@ -11,6 +11,9 @@ from .forms import SignInForm, PublicMessageForm
 # Create your views here.
 class SignUp(APIView):
 
+    def get(self, request):
+        pass
+
     def post(self, request):
         data = request.data
         serializer = UserSerializer(data=data)
@@ -57,7 +60,7 @@ class SignIn(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-class Feed(APIView):
+class Home(APIView):
 
     def get(self, request):
         form = PublicMessageForm()
