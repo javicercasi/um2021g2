@@ -15,13 +15,17 @@ class PublisherModel(models.Model):
 
 
 class UserModel(PublisherModel):
-    password = models.CharField(max_length=50, validators=[MinLengthValidator(4)])
+    password = models.CharField(max_length=50, validators=[MinLengthValidator(8)])
     firstName = models.CharField(max_length=50)
     lastName = models.CharField(max_length=50)
     email = models.EmailField()
     phone = models.CharField(max_length=20, blank=True)
     birthday = models.DateField(blank=True)
     follows = models.ManyToManyField('self', through='FollowRelationship', symmetrical=False, blank=True)
+
+
+class CompanyModel(PublisherModel):
+    apiKey = models.CharField(max_length=50, validators=[MinLengthValidator(50)])
 
 
 class FollowRelationship(models.Model):
@@ -38,8 +42,15 @@ class TagModel(models.Model):
 
 
 class PublicMessageModel(models.Model):
-    author = models.ForeignKey(PublisherModel, related_name='author', null=False, blank=False, on_delete=models.SET(get_sentinel_user))
+    author = models.ForeignKey(PublisherModel, null=False, blank=False, on_delete=models.SET(get_sentinel_user))
     text = models.CharField(max_length=140)
     date = models.DateField()
-    mentions = models.ManyToManyField(PublisherModel, related_name='mentions', blank=True)
+    mentions = models.ManyToManyField(PublisherModel, blank=True)
     tags = models.ManyToManyField(TagModel, blank=True)
+
+
+class PrivateMessageModel(models.Model):
+    source = models.ForeignKey(PublisherModel, null=False, blank=False, on_delete=models.SET(get_sentinel_user))
+    destination = models.ForeignKey(PublisherModel, null=False, blank=False, on_delete=models.SET(get_sentinel_user))
+    date = models.DateField()
+    text = models.CharField(max_length=250)
