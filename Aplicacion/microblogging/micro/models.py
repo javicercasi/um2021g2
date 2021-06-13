@@ -10,12 +10,12 @@ def get_sentinel_user():
 
 class PublisherModel(models.Model):
     username = models.CharField(max_length=15, blank=False)
+    password = models.CharField(max_length=50, validators=[MinLengthValidator(8)])
     bio = models.CharField(max_length=250, blank=True)
     active = models.BooleanField(default=True)
 
 
 class UserModel(PublisherModel):
-    password = models.CharField(max_length=50, validators=[MinLengthValidator(8)])
     firstName = models.CharField(max_length=50)
     lastName = models.CharField(max_length=50)
     email = models.EmailField()
