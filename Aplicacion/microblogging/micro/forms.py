@@ -2,6 +2,67 @@ from django import forms
 from .models import PublicMessageModel, PublisherModel, UserModel
 
 
+class SignUpFormUser(forms.ModelForm):
+
+    class Meta:
+
+        model = UserModel
+
+        fields = [
+            'username',
+            'firstName',
+            'lastName',
+            'email',
+            'phone',
+            'birthday',
+            'bio',
+            'password',
+        ]
+
+        labels = {
+            'username': 'Username:',
+            'firstName': 'First Name:',
+            'lastName': 'Last Name:',
+            'email': 'Email:',
+            'phone': 'Phone:',
+            'birthday': 'Birthday:',
+            'bio': 'Tell me about yourself:',
+            'password': 'Password:',
+        }
+
+    username = forms.CharField()
+    firstName = forms.CharField()
+    lastName = forms.CharField()
+    email = forms.EmailField()
+    phone = forms.CharField()
+    birthday = forms.DateField()
+    bio = forms.CharField()
+    password = forms.CharField()
+
+
+class SignUpFormCompany(forms.ModelForm):
+
+    class Meta:
+
+        model = UserModel
+
+        fields = [
+            'username',
+            'bio',
+            'password',
+        ]
+
+        labels = {
+            'username': 'User:',
+            'bio': 'Tell me about your company:',
+            'password': 'Password:',
+        }
+
+    username = forms.CharField()
+    bio = forms.CharField()
+    password = forms.CharField()
+
+
 class SignInForm(forms.ModelForm):
 
     class Meta:
@@ -14,8 +75,8 @@ class SignInForm(forms.ModelForm):
         ]
 
         labels = {
-            'username': 'User',
-            'password': 'Password',
+            'username': 'User:',
+            'password': 'Password:',
         }
 
     username = forms.CharField()
@@ -35,7 +96,7 @@ class PublicMessageForm(forms.ModelForm):
 
         labels = {
             'author': 'Who are you?',
-            'text': "What's up?",
+            'text': "Whats happening?",
         }
 
     author = PublisherModel()
