@@ -14,6 +14,9 @@ class PublisherModel(models.Model):
     bio = models.CharField(max_length=250, blank=True)
     active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.username
+
 
 class UserModel(PublisherModel):
     firstName = models.CharField(max_length=50)
