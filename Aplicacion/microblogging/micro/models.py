@@ -42,15 +42,15 @@ class TagModel(models.Model):
 
 
 class PublicMessageModel(models.Model):
-    author = models.ForeignKey(PublisherModel, null=False, blank=False, on_delete=models.SET(get_sentinel_user))
+    author = models.ForeignKey(PublisherModel, related_name='author', null=False, blank=False, on_delete=models.SET(get_sentinel_user))
     text = models.CharField(max_length=140)
     date = models.DateField()
-    mentions = models.ManyToManyField(PublisherModel, blank=True)
+    mentions = models.ManyToManyField(PublisherModel, related_name='mentions', blank=True)
     tags = models.ManyToManyField(TagModel, blank=True)
 
 
 class PrivateMessageModel(models.Model):
-    source = models.ForeignKey(PublisherModel, null=False, blank=False, on_delete=models.SET(get_sentinel_user))
-    destination = models.ForeignKey(PublisherModel, null=False, blank=False, on_delete=models.SET(get_sentinel_user))
+    source = models.ForeignKey(PublisherModel, related_name='source', null=False, blank=False, on_delete=models.SET(get_sentinel_user))
+    destination = models.ForeignKey(PublisherModel, related_name='destination', null=False, blank=False, on_delete=models.SET(get_sentinel_user))
     date = models.DateField()
     text = models.CharField(max_length=250)
