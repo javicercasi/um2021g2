@@ -2,10 +2,11 @@ from datetime import datetime
 from .models import PublicMessageModel, PublisherModel, UserModel
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
-from .serializers import UserSerializer, PublicMessageSerializer
+from .serializers import PublicMessageSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .forms import SignUpFormUser, SignInForm, PublicMessageForm
+from django.contrib.auth.hashers import make_password
 
 
 # Create your views here.
@@ -21,6 +22,7 @@ class SignUp(APIView):
             try:
                 PublisherModel.objects.get(username=form.data['username'])
             except Exception:
+                form.data['password'] = make_password(form.data['password'])
                 form.save()
                 return redirect('/')
             return Response({
@@ -52,13 +54,8 @@ class SignIn(APIView):
                     'state': 'failure',
                     'error': "User doesn't exist"
                     }, status=status.HTTP_400_BAD_REQUEST)
-            user_json = UserSerializer(user)
             if user.password == data['password']:
-                return Response({
-                    'state': 'successful',
-                    'csrfmiddlewaretoken': data['csrfmiddlewaretoken'],
-                    'request': user_json.data,
-                    }, status=status.HTTP_200_OK)
+                return redirect('/')
         return Response({
             'state': 'failure',
             'request': data,
