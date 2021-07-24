@@ -1,5 +1,5 @@
 from django import forms
-from .models import PublicMessageModel, PublisherModel, UserModel
+from .models import PublicMessageModel, UserModel
 
 
 class SignUpFormUser(forms.ModelForm):
@@ -10,8 +10,8 @@ class SignUpFormUser(forms.ModelForm):
 
         fields = [
             'username',
-            'firstName',
-            'lastName',
+            'first_name',
+            'last_name',
             'email',
             'phone',
             'birthday',
@@ -21,8 +21,8 @@ class SignUpFormUser(forms.ModelForm):
 
         labels = {
             'username': 'Username:',
-            'firstName': 'First Name:',
-            'lastName': 'Last Name:',
+            'first_name': 'First Name:',
+            'last_name': 'Last Name:',
             'email': 'Email:',
             'phone': 'Phone:',
             'birthday': 'Birthday:',
@@ -31,8 +31,8 @@ class SignUpFormUser(forms.ModelForm):
         }
 
     username = forms.CharField()
-    firstName = forms.CharField()
-    lastName = forms.CharField()
+    first_name = forms.CharField()
+    last_name = forms.CharField()
     email = forms.EmailField()
     phone = forms.CharField()
     birthday = forms.DateField()
@@ -63,26 +63,6 @@ class SignUpFormCompany(forms.ModelForm):
     password = forms.CharField()
 
 
-class SignInForm(forms.ModelForm):
-
-    class Meta:
-
-        model = UserModel
-
-        fields = [
-            'username',
-            'password',
-        ]
-
-        labels = {
-            'username': 'User:',
-            'password': 'Password:',
-        }
-
-    username = forms.CharField()
-    password = forms.CharField()
-
-
 class PublicMessageForm(forms.ModelForm):
 
     class Meta:
@@ -90,14 +70,11 @@ class PublicMessageForm(forms.ModelForm):
         model = PublicMessageModel
 
         fields = [
-            'author',
             'text',
         ]
 
         labels = {
-            'author': 'Who are you?',
             'text': "Whats happening?",
         }
 
-    author = PublisherModel()
     text = forms.CharField()
