@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinLengthValidator
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 
 
 # Create your models here.
@@ -8,26 +9,30 @@ def get_sentinel_user():
     return get_user_model().objects.get_or_create(username='deleted')[0]
 
 
-class PublisherModel(models.Model):
-    username = models.CharField(max_length=15, blank=False)
-    password = models.CharField(max_length=50, validators=[MinLengthValidator(8)])
+class PublisherModel(User):
     bio = models.CharField(max_length=250, blank=True)
-    active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.username
 
 
 class UserModel(PublisherModel):
-    firstName = models.CharField(max_length=50)
-    lastName = models.CharField(max_length=50)
-    email = models.EmailField()
+
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+
     phone = models.CharField(max_length=20, blank=True)
     birthday = models.DateField(blank=True)
     follows = models.ManyToManyField('self', through='FollowRelationship', symmetrical=False, blank=True)
 
 
 class CompanyModel(PublisherModel):
+
+    class Meta:
+        verbose_name = "Company"
+        verbose_name_plural = "Companies"
+
     apiKey = models.CharField(max_length=50, validators=[MinLengthValidator(50)])
 
 

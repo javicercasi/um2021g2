@@ -1,12 +1,10 @@
 from datetime import datetime
-from .models import PublicMessageModel, PublisherModel, UserModel
+from .models import FollowRelationship, PublicMessageModel, PublisherModel, UserModel
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
 from .serializers import PublicMessageSerializer
-from rest_framework.response import Response
-from rest_framework import status
-from .forms import SignUpFormUser, SignInForm, PublicMessageForm
-from django.contrib.auth.hashers import make_password
+from .forms import SignUpFormUser, PublicMessageForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # Create your views here.
@@ -14,7 +12,7 @@ class SignUp(APIView):
 
     def get(self, request):
         form = SignUpFormUser()
-        return render(request, "signup.html", {"form": form})
+        return render(request, "registration/signup.html", {"form": form})
 
     def post(self, request):
         form = SignUpFormUser(request.POST)
@@ -22,53 +20,30 @@ class SignUp(APIView):
             try:
                 PublisherModel.objects.get(username=form.data['username'])
             except Exception:
-                form.data['password'] = make_password(form.data['password'])
-                form.save()
+                user = form.save(commit=False)
+                password = form.cleaned_data['password']
+                user.set_password(password)
+                user.save()
                 return redirect('/')
-            return Response({
-                'state': 'user_failure',
-                'request': form.data,
-                'error': 'User already exists'
-                }, status=status.HTTP_400_BAD_REQUEST)
-        return Response({
-                'state': 'form_failure',
-                'request': form.data,
-                'error': form.errors
-                }, status=status.HTTP_400_BAD_REQUEST)
+        return redirect('/signup')
 
 
-class SignIn(APIView):
-
-    def get(self, request):
-        form = SignInForm()
-        return render(request, "signin.html", {"form": form})
-
-    def post(self, request):
-        form = SignInForm(request.POST)
-        data = form.data
-        if form.is_valid():
-            try:
-                user = UserModel.objects.get(username=data['username'])
-            except (Exception):
-                return Response({
-                    'state': 'failure',
-                    'error': "User doesn't exist"
-                    }, status=status.HTTP_400_BAD_REQUEST)
-            if user.password == data['password']:
-                return redirect('/')
-        return Response({
-            'state': 'failure',
-            'request': data,
-            'error': form.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-
-class Home(APIView):
+class Home(LoginRequiredMixin, APIView):
 
     def get(self, request):
         form = PublicMessageForm()
-        messages = PublicMessageModel.objects.all()
-        return render(request, "feed.html", {"form": form, "messages": messages})
+        user = request.user
+        follows = FollowRelationship.objects.filter(from_user=user.id)
+        all_messages = []
+        own_messages = PublicMessageModel.objects.filter(author=user.id)
+        for message in own_messages:
+            all_messages.append(message)
+        for follow in follows:
+            user = UserModel.objects.get(id=follow.to_user.id)
+            follow_messages = PublicMessageModel.objects.filter(author=user.id)
+            for message in follow_messages:
+                all_messages.append(message)
+        return render(request, "index.html", {"form": form, "messages": all_messages})
 
     def post(self, request):
         form = PublicMessageForm(request.POST)
@@ -76,18 +51,8 @@ class Home(APIView):
             data = {}
             data['text'] = form.data['text']
             data['date'] = datetime.now().date()
-            data['author'] = UserModel.objects.get(id=form.data['author']).id
+            data['author'] = request.user.id
             serializer = PublicMessageSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
                 return redirect('/')
-            return Response({
-                'state': 'serializer_failure',
-                'request': serializer.data,
-                'error': serializer.errors
-                }, status=status.HTTP_400_BAD_REQUEST)
-        return Response({
-                'state': 'form_failure',
-                'request': form.data,
-                'error': form.errors
-                }, status=status.HTTP_400_BAD_REQUEST)

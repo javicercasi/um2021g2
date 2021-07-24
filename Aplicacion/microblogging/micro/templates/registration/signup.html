@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}<title>Sign Up</title>{% endblock %}
+{% block content %}
+    <div class="contenido">
+        <div class="signheader">
+            {% load static %}
+            <img class="logo" src="{% static 'imgs/logo.png' %}">
+            <h1>Microblogging</h1>
+        </div>
+        {% if form.errors %}
+        <p>{{form.errors}}</p>
+        {% endif %}
+        <div class="form">
+            <form action="" method="POST">{% csrf_token %}
+                <table>
+                    {{form.as_table}}
+                </table>
+                <button type="submit" class="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
