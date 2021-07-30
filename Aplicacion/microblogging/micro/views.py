@@ -10,13 +10,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 class SignUp(APIView):
 
-    def get(self, request):
+    def get(self, request):  #Traer la pagina para registro, definiendo un formulario y como se muestra
         form = SignUpFormUser()
         return render(request, "registration/signup.html", {"form": form})
 
+    #Para registrar un nuevo usuario:
     def post(self, request):
         form = SignUpFormUser(request.POST)
-        if form.is_valid():
+        if form.is_valid():  #Chequea si existe, para no volver a crearlo
             try:
                 PublisherModel.objects.get(username=form.data['username'])
             except Exception:
@@ -29,7 +30,7 @@ class SignUp(APIView):
 
 
 class Home(LoginRequiredMixin, APIView):
-
+    # Al traer el feed, muestra los mensajes de propios y de los seguidos en el feed:
     def get(self, request):
         form = PublicMessageForm()
         user = request.user
@@ -45,7 +46,7 @@ class Home(LoginRequiredMixin, APIView):
                 all_messages.append(message)
         return render(request, "index.html", {"form": form, "messages": all_messages})
 
-    def post(self, request):
+    def post(self, request): # Para crear un nuevo mensaje, si es valido crea un nuevo dicc y lo guarda
         form = PublicMessageForm(request.POST)
         if form.is_valid():
             data = {}

@@ -1,7 +1,10 @@
 from django import forms
 from .models import PublicMessageModel, UserModel
 
-
+# Como se muestran los campos en el formulario a completar con sus atributos.
+# Es para el manejo de formularios de Django. Especifica los campos en 
+# el formulario, su diseño, widgets de visualización, etiquetas, 
+# valores iniciales, valores válidos 
 class SignUpFormUser(forms.ModelForm):
 
     class Meta:
