@@ -90,6 +90,7 @@ DATABASES = {
         'PASSWORD': 'microblogging',
         'HOST': 'localhost',
         'PORT': '3306',
+        'TEST_NAME': 'test_microdb',
     }
 }
 
